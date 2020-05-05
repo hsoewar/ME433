@@ -32,6 +32,16 @@
 #pragma config PMDL1WAY = OFF // allow multiple reconfigurations
 #pragma config IOL1WAY = OFF // allow multiple reconfigurations
 
+typedef struct { 
+    unsigned char r;
+    unsigned char g;
+    unsigned char b;
+} wsColor; // defines the wsColor array to be used in everything
+    
+void heartbeat_setup(); // for LED heartbeat
+void heartbeat();
+
+wsColor HSBtoRGB(float hue, float sat, float brightness); // because otherwise C thinks HSBtoRGB should output an int
 
 int main() {
 
@@ -50,28 +60,67 @@ int main() {
     DDPCONbits.JTAGEN = 0;
 
     // do your TRIS and LAT commands here
-    heartbeat_setup(); //sets pin for LED flashing    
-    i2c_master_setup(); // initializes I2C connection
-    ssd1306_setup(); // initializes OLED screen
+    heartbeat_setup();
+    
+    ws2812b_setup(); //sets up LEDs
     
     __builtin_enable_interrupts();
     
-
+    wsColor LED1; //defines wsColor structure for LEDs
+    wsColor LED2;
+    wsColor LED3;
+    wsColor LED4;
+    float i = 0; // count for hue
+    float j;
+    float k;
+    float l;
+    float n = 60; // increment between led hues
+    float sat = 1; //not at all gray
+    float bright = 0.25; // so I don't go blind
     
     while (1) {
+        //heartbeat();
         
-        _CP0_SET_COUNT(0);
-        while (_CP0_GET_COUNT() < 48000000 / 2 / 1 ) { // 1Hz delay
-            LATAbits.LATA4 = 0;
-            ssd1306_drawPixel(0, 0, 1);
-            ssd1306_update();
+        j = i+n;
+        k = j+n;
+        l = k+n;
+        
+        if (i >= 360) {
+            i=i-360;
         }
-        _CP0_SET_COUNT(0);
-        while (_CP0_GET_COUNT() < 48000000 / 2 / 1 ) { // 1Hz delay
-            LATAbits.LATA4 = 1;
-            ssd1306_drawPixel(0, 0, 0);
-            ssd1306_update();
+        if (j >= 360) {
+            j=j-360;
         }
+        if (k >= 360) {
+            k=k-360;
+        }
+        if (l >= 360) {
+            l=l-360;
+        }
+        
+        LED1 = HSBtoRGB(i, sat, bright);
+        LED2 = HSBtoRGB(j, sat, bright);
+        LED3 = HSBtoRGB(k, sat, bright);
+        LED4 = HSBtoRGB(l, sat, bright);
+        
+        wsColor c[4] = {LED1, LED2, LED3, LED4}; // sets some color..?
+        int numLEDs = 4; // 4 LEDs used
+        ws2812b_setColor(c,numLEDs);
+        
+        i = i + 0.1;
+        
+
+        /* // basic setup of LEDs using hex
+        wsColor LED1 = {0xFF, 0xFF, 0xFF};
+        wsColor LED2 = {0xFF, 0x00, 0x00};
+        wsColor LED3 = {0x00, 0xFF, 0x00};
+        wsColor LED4 = {0x00, 0x00, 0xFF};
+        
+        wsColor c[4] = {LED1, LED2, LED3, LED4}; // sets some color..?
+        
+        int numLEDs = 4; // 4 LEDs used
+        ws2812b_setColor(c,numLEDs);*/
+        
     }
 }
 
@@ -79,4 +128,17 @@ int main() {
 void heartbeat_setup() {
     TRISAbits.TRISA4 = 0;
     LATAbits.LATA4 = 0;
+}
+
+
+// heartbeat LED
+void heartbeat() {
+    _CP0_SET_COUNT(0);
+    while (_CP0_GET_COUNT() < 48000000 / 2 / 2 ) { // 2Hz delay
+        LATAbits.LATA4 = 0;
+    }
+    _CP0_SET_COUNT(0);
+    while (_CP0_GET_COUNT() < 48000000 / 2 / 2 ) { // 2Hz delay
+        LATAbits.LATA4 = 1;
+    }
 }

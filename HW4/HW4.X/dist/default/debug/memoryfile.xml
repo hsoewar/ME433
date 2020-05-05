@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?> 
 <project>                                  
-  <executable name="dist/default/production/HW4.X.production.elf">                 
+  <executable name="dist/default/debug/HW4.X.debug.elf">                 
     <memory name="program">                 
       <units>bytes</units>                 
       <length>263312</length>                 
-      <used>3764</used>                     
-      <free>259548</free>                     
+      <used>3720</used>                     
+      <free>259592</free>                     
     </memory>                              
     <memory name="data">              
       <units>bytes</units>                 
-      <length>65536</length>                 
-      <used>516</used>                     
-      <free>65020</free>                     
+      <length>66048</length>                 
+      <used>1540</used>                     
+      <free>64508</free>                     
     </memory>                              
   </executable>                            
 </project>                                 
