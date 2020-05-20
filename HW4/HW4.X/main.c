@@ -60,7 +60,7 @@ int main() {
     __builtin_enable_interrupts();
         
     
-    _CP0_SET_COUNT(0);
+    
     unsigned int i = 0;
     float FPS = 0;
     unsigned int j = 0;
@@ -86,21 +86,26 @@ int main() {
         */
         
         //PART 3
-        //heartbeat(); // just to make things are working
-        
         char message[50]; 
         sprintf(message, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
         drawString(0,0,message);
         sprintf(message, "012345678901234567890123456");
         drawString(0,8,message);
         
+        
+        _CP0_SET_COUNT(0);
+//        int second = 48000000 /2; // converts clock into seconds 
+//        int clock = second / 100; // 100 Hz delay
+//        while (_CP0_GET_COUNT() < clock ) {
+//            while (_CP0_GET_COUNT() < clock / 2 ) {LATAbits.LATA4 = 0;}
+//            while (_CP0_GET_COUNT() < clock )     {LATAbits.LATA4 = 1;}
+//        } 
+        j = _CP0_GET_COUNT();
+        i = i + (j);
+        FPS =  (j)*60;
+        
         sprintf(message, "Uhh... Hi?   i = %i", i);
         drawString(0,16,message);
-        j = i;
-        i = (_CP0_GET_COUNT() / 480000 / 2 >>2);
-        
-        FPS = (i-j);
-        
         sprintf(message, "           FPS = %.02f", FPS);
         drawString(0,24,message);
         ssd1306_update();
